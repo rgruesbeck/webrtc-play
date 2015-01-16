@@ -1,0 +1,18 @@
+{
+  "name": "webrtc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "ecstatic": "^0.5.8",
+    "webrtc": "^1.13.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index.js",
+    "test": "test",
+    "browserify": "browserify browser.js > build/js/bundle.js"
+  },
+  "author": "",
+  "license": "ISC"
+}

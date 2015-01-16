@@ -1,0 +1,5 @@
+node_modules
+sketches
+*.log
+*.swp
+*.swo
