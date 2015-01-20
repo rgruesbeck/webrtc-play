@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 function go(){
 
+  //set signal server uri
+  var signalserver = shoe("http://localhost:9999/peers");
+
   var PeerConnection = window.webkitRTCPeerConnection;
   var IceCandidate = window.RTCIceCandidate;
   var SessionDescription = window.RTCSessionDescription;
@@ -37,45 +40,44 @@ function go(){
     //candidate exists in e.candidate
     if (!e.candidate) return;
     console.log('icecandidate event detected!');
-    send("icecandidate", JSON.stringify(e.candidate));
+    send('ICECANDIDATE', JSON.stringify(e.candidate));
     pc.onicecandidate = null;
   };
 
-  /*
-    Signaling server:
-    use FireBase for now...
-    https://www.firebase.com/
-
-    firebase data structure would be like...
-
-    {
-      "<roomid>": {
-        "candidate:<peertype>": …
-        "offer": …
-        "answer": … 
-      }
-    }</peertype></roomid>
-
-  */
-
-  function send(key, value){
-    //takes a key and assigns a data to it.
-    localStorage.setItem(key, value);
+  function query(type, opts, cb){
+    var msg = JSON.stringify({
+      type: type,
+      body: opts || {}
+    });
+    signalserver.write(msg);
+    if (cb) signalserver.on('data', cb);
   }
 
-  function recv(key, cb){
-    //calls a handler when a key has a value.
-    //if key returns value, run callback on data
-    var val = localStorage.getItem(key);
-    if (!val) return;
-    cb(val);
+  function send(type, body, cb){
+    signalserver.on('connect', function(){
+      var msg = JSON.stringify({
+        type: type,
+        body: body
+      });
+      signalserver.write(msg);
+      if (cb) return signalserver.on('data', cb);
+    });
   }
+
+  function recv(type, cb){
+    //on receiving offer, send answer
+  }
+
+  //query for list of peers
+  query('LIST.PEERS', null, function(data){
+    console.log(data);
+  });
 
   //send and offer to other peer
   pc.createOffer(function(offer){
     pc.setLocalDescription(offer);
 
-    send("offer", JSON.stringify(offer));
+    send('OFFER', JSON.stringify(offer));
   }, errorHandler, constraints);
 
   //log error
@@ -95,7 +97,7 @@ function go(){
     pc.setRemoteDescription(offer);
     pc.createAnswer(function(answer){
       pc.setLocalDescription(answer);
-      send("answer", JSON.stringify(answer));
+      send('ANSWER', JSON.stringify(answer));
     }, errorHandler, constraints);
   });
 

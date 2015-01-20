@@ -1,5 +1,8 @@
-node_modules
-sketches
-*.log
+logs/*
+npm-debug.log
+node_modules/
+sketches/
+.DS_Store
+.idea
 *.swp
 *.swo
