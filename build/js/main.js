@@ -4,8 +4,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 function go(){
 
-  //set signal server uri
-  var signalserver = shoe("http://localhost:9999/peers");
+  //create signal channel
+  var signalchannel = signalChannel('http://localhost:9999/peers');
 
   var PeerConnection = window.webkitRTCPeerConnection;
   var IceCandidate = window.RTCIceCandidate;
@@ -40,29 +40,10 @@ function go(){
     //candidate exists in e.candidate
     if (!e.candidate) return;
     console.log('icecandidate event detected!');
-    send('ICECANDIDATE', JSON.stringify(e.candidate));
+    SignalChannel.send('ICECANDIDATE', JSON.stringify(e.candidate));
     pc.onicecandidate = null;
   };
 
-  function query(type, opts, cb){
-    var msg = JSON.stringify({
-      type: type,
-      body: opts || {}
-    });
-    signalserver.write(msg);
-    if (cb) signalserver.on('data', cb);
-  }
-
-  function send(type, body, cb){
-    signalserver.on('connect', function(){
-      var msg = JSON.stringify({
-        type: type,
-        body: body
-      });
-      signalserver.write(msg);
-      if (cb) return signalserver.on('data', cb);
-    });
-  }
 
   function recv(type, cb){
     //on receiving offer, send answer
@@ -77,7 +58,7 @@ function go(){
   pc.createOffer(function(offer){
     pc.setLocalDescription(offer);
 
-    send('OFFER', JSON.stringify(offer));
+    SignalChannel.send('OFFER', JSON.stringify(offer));
   }, errorHandler, constraints);
 
   //log error
@@ -97,7 +78,7 @@ function go(){
     pc.setRemoteDescription(offer);
     pc.createAnswer(function(answer){
       pc.setLocalDescription(answer);
-      send('ANSWER', JSON.stringify(answer));
+      SignalChannel.send('ANSWER', JSON.stringify(answer));
     }, errorHandler, constraints);
   });
 
@@ -140,5 +121,4 @@ function go(){
   //channel.send("Hi Peer!");
 
   //close() closes connection
-
 }

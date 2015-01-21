@@ -4,12 +4,16 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "dnode": "^1.2.0",
+    "domready": "^1.0.7",
     "ecstatic": "^0.5.8",
+    "shoe": "0.0.15",
     "webrtc": "^1.13.0"
   },
   "devDependencies": {},
   "scripts": {
     "start": "node index.js",
+    "devserver": "nodemon index.js",
     "test": "test",
     "browserify": "browserify browser.js > build/js/bundle.js"
   },

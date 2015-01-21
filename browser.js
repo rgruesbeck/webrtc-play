@@ -1,5 +1,5 @@
-var WebRTC = require('webrtc');
-var shoe = require('shoe');
+var domready = require('domready');
+var signalChannel = require('./modules/signalchannel');
 
-window.shoe = shoe;
-window.WebRTC = WebRTC;
+window.domready = domready;
+window.signalChannel = signalChannel;
