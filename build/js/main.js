@@ -7,17 +7,11 @@ function go(){
   //create signal channel
   var signalchannel = signalChannel('http://localhost:9999/peers');
 
-  /*
   document.querySelector('.getpeers').addEventListener('click', function(){
     signalchannel.getPeers(function(peers){
       console.log(peers);
     });
   });
-  */
-
-  document.querySelector('.getpeers').addEventListener('click', signalchannel.getPeers(function(peers){
-    console.log(peers);
-  }));
 
   var PeerConnection = window.webkitRTCPeerConnection;
   var IceCandidate = window.RTCIceCandidate;
