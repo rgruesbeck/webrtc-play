@@ -7,6 +7,7 @@
     "dnode": "^1.2.0",
     "domready": "^1.0.7",
     "ecstatic": "^0.5.8",
+    "rpc-stream": "^2.1.1",
     "shoe": "0.0.15",
     "webrtc": "^1.13.0"
   },

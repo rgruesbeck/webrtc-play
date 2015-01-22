@@ -1,13 +1,16 @@
 var shoe = require('shoe');
-var dnode = require('dnode');
+var rpc = require('rpc-stream');
 
 module.exports = function(uri){
   var stream = shoe(uri);
-  var d = dnode();
-  d.on('remote', function(remote){
-    remote.query(null, function(peers){
-      console.log(peers);
-    });
-  });
-  d.pipe(stream).pipe(d);
+  var client = rpc();
+
+  client.pipe(stream).pipe(client);
+
+  var remote = client.wrap([
+      'getPeers',
+      'sendICE',
+      'sendSDP'
+  ]);
+  return remote;
 };

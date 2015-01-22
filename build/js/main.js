@@ -7,6 +7,18 @@ function go(){
   //create signal channel
   var signalchannel = signalChannel('http://localhost:9999/peers');
 
+  /*
+  document.querySelector('.getpeers').addEventListener('click', function(){
+    signalchannel.getPeers(function(peers){
+      console.log(peers);
+    });
+  });
+  */
+
+  document.querySelector('.getpeers').addEventListener('click', signalchannel.getPeers(function(peers){
+    console.log(peers);
+  }));
+
   var PeerConnection = window.webkitRTCPeerConnection;
   var IceCandidate = window.RTCIceCandidate;
   var SessionDescription = window.RTCSessionDescription;
@@ -39,26 +51,17 @@ function go(){
   pc.onicecandidate = function(e){
     //candidate exists in e.candidate
     if (!e.candidate) return;
-    console.log('icecandidate event detected!');
-    SignalChannel.send('ICECANDIDATE', JSON.stringify(e.candidate));
+    //SignalChannel.send('ICECANDIDATE', JSON.stringify(e.candidate));
     pc.onicecandidate = null;
   };
 
 
-  function recv(type, cb){
-    //on receiving offer, send answer
-  }
-
-  //query for list of peers
-  query('LIST.PEERS', null, function(data){
-    console.log(data);
-  });
 
   //send and offer to other peer
   pc.createOffer(function(offer){
     pc.setLocalDescription(offer);
 
-    SignalChannel.send('OFFER', JSON.stringify(offer));
+    //SignalChannel.send('OFFER', JSON.stringify(offer));
   }, errorHandler, constraints);
 
   //log error
@@ -72,35 +75,39 @@ function go(){
     mandatory: {}
   };
 
+
+
+  /*
   recv("offer", function(offer){
     console.log('recieving offer...');
     offer = new SessionDescription(JSON.parse(offer));
     pc.setRemoteDescription(offer);
     pc.createAnswer(function(answer){
       pc.setLocalDescription(answer);
-      SignalChannel.send('ANSWER', JSON.stringify(answer));
+      //SignalChannel.send('ANSWER', JSON.stringify(answer));
     }, errorHandler, constraints);
   });
+  */
 
   //Note: Interoperability between Chrome and Firefox is not possible with DataChannels. Chrome supports a similar but private protocol and will be supporting the standard protocol soon.
   //Chrome also does not support channelOptions so leave it empty for now
   var channelOptions = {};
   var channelName = 'sync';
-  var channel = pc.createDataChannel(channelName, channelOptions);
+  var dataChannel = pc.createDataChannel(channelName, channelOptions);
 
-  channel.onerror = function(err){
+  dataChannel.onerror = function(err){
     console.error("Channel Error: ", err);
   };
 
-  channel.onmessage = function(msg){
+  dataChannel.onmessage = function(msg){
     console.log("Got message: " + msg.data);
   };
 
-  channel.onopen = function () {
+  dataChannel.onopen = function () {
     console.log("datachannel open");
   };
 
-  channel.onclose = function () {
+  dataChannel.onclose = function () {
     console.log("datachannel close");
   };
 
@@ -118,7 +125,7 @@ function go(){
   };
 
   //send message to peer over channel!
-  //channel.send("Hi Peer!");
+  //dataChannel.send("Hi Peer!");
 
   //close() closes connection
 }
