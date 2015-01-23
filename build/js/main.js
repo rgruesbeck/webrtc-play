@@ -5,11 +5,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
 function go(){
 
   //create signal channel
-  var signalchannel = signalChannel('http://localhost:9999/peers');
+  var uri = 'http://192.168.171.81:9999/peers';
+  var signalchannel = signalChannel(uri);
 
   document.querySelector('.getpeers').addEventListener('click', function(){
     signalchannel.getPeers(function(peers){
-      console.log(peers);
+      var peerlist = document.querySelector('.peerslist');
+      peers.forEach(function(peer){
+        var exists = document.getElementById(peer);
+        if (!exists) {
+          var p = document.createElement('li');
+          p.setAttribute('id', peer);
+          p.textContent = peer;
+          peerlist.appendChild(p);
+        }
+      });
     });
   });
 
