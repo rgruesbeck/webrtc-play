@@ -5,8 +5,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
 function go(){
 
   //create signal channel
-  var uri = 'http://192.168.171.81:9999/peers';
+  //var uri = 'http://192.168.171.81:9999/peers';
+  var uri = 'http://localhost:9999/peers';
   var signalchannel = signalChannel(uri);
+
+  var mx = MuxDemux();
+  var stream = shoe(uri);
+
+  mx.createStream('rpc');
+  mx.createStream('notice');
+
+  stream.pipe(mx).pipe(stream);
 
   document.querySelector('.getpeers').addEventListener('click', function(){
     signalchannel.getPeers(function(peers){
