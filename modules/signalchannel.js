@@ -8,7 +8,6 @@ module.exports = function(uri){
   client.pipe(stream).pipe(client);
 
   var remote = client.wrap([
-      'getPeers',
       'sendICE',
       'sendSDP'
   ]);

@@ -6,31 +6,18 @@ function go(){
 
   //create signal channel
   //var uri = 'http://192.168.171.81:9999/peers';
+  //var signalchannel = signalChannel(uri);
   var uri = 'http://localhost:9999/peers';
-  var signalchannel = signalChannel(uri);
 
   var mx = MuxDemux();
   var stream = shoe(uri);
 
-  mx.createStream('rpc');
-  mx.createStream('notice');
+  var rpcStream = mx.createStream('rpc');
+  var msgStream = mx.createStream('notice');
 
-  stream.pipe(mx).pipe(stream);
-
-  document.querySelector('.getpeers').addEventListener('click', function(){
-    signalchannel.getPeers(function(peers){
-      var peerlist = document.querySelector('.peerslist');
-      peers.forEach(function(peer){
-        var exists = document.getElementById(peer);
-        if (!exists) {
-          var p = document.createElement('li');
-          p.setAttribute('id', peer);
-          p.textContent = peer;
-          peerlist.appendChild(p);
-        }
-      });
-    });
-  });
+  stream
+    .pipe(mx)
+    .pipe(stream);
 
   var PeerConnection = window.webkitRTCPeerConnection;
   var IceCandidate = window.RTCIceCandidate;
