@@ -3,21 +3,52 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 
 function go(){
+  var signalChannel;
+  signal();
 
-  //create signal channel
-  //var uri = 'http://192.168.171.81:9999/peers';
-  //var signalchannel = signalChannel(uri);
-  var uri = 'http://localhost:9999/peers';
+  function signal(){
+    //var uri = 'http://192.168.171.81:9999/peers';
+    var uri = 'http://localhost:9999/peers';
+    var stream = shoe(uri);
+    stream.pipe(multiStream()).pipe(stream);
+  }
 
-  var mx = MuxDemux();
-  var stream = shoe(uri);
+  function multiStream(){
+    var mdm = MuxDemux();
 
-  var rpcStream = mx.createStream('rpc');
-  var msgStream = mx.createStream('notice');
+    var rpcStream = mdm.createStream('rpc');
+    var client = createRpc();
+    client.pipe(rpcStream).pipe(client);
+    signalChannel = client.wrap([
+        'sendICE',
+        'sendSDP'
+    ]);
 
-  stream
-    .pipe(mx)
-    .pipe(stream);
+    mdm.on('connection', function(stream){
+      if (stream.meta == 'msg') {
+        stream.on('data', function(data){
+          console.log(data);
+        });
+      }
+    });
+
+    mdm.on('close', function(stream){
+      console.log('lost connection to signaling server...');
+    });
+
+    mdm.on('error', function(err){
+      console.log(err.toString());
+      mdm.destroy();
+    });
+
+    return mdm;
+  }
+
+  //testing send ICE
+  signalChannel.sendICE({
+    to: 'other peer',
+    ice: 'here is your ice'
+  });
 
   var PeerConnection = window.webkitRTCPeerConnection;
   var IceCandidate = window.RTCIceCandidate;
